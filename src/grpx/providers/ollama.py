@@ -6,7 +6,7 @@ import json
 import urllib.error
 import urllib.request
 
-from .base import BaseProvider, ProviderError
+from .base import BaseProvider, ProviderError, format_http_error
 
 
 class OllamaProvider(BaseProvider):
@@ -23,5 +23,6 @@ class OllamaProvider(BaseProvider):
                 body = json.loads(response.read().decode("utf-8"))
                 return body.get("response", "")
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="ignore")
-            raise ProviderError(f"Ollama error {exc.code}: {detail}") from exc
+            raise ProviderError(format_http_error("Ollama", exc)) from exc
+        except urllib.error.URLError as exc:
+            raise ProviderError(f"Ollama connection error: {exc.reason}") from exc

@@ -6,7 +6,7 @@ import json
 import urllib.error
 import urllib.request
 
-from .base import BaseProvider, ProviderError
+from .base import BaseProvider, ProviderError, format_http_error
 
 
 class OpenAIProvider(BaseProvider):
@@ -33,5 +33,6 @@ class OpenAIProvider(BaseProvider):
                 body = json.loads(response.read().decode("utf-8"))
                 return body["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="ignore")
-            raise ProviderError(f"OpenAI error {exc.code}: {detail}") from exc
+            raise ProviderError(format_http_error("OpenAI", exc)) from exc
+        except urllib.error.URLError as exc:
+            raise ProviderError(f"OpenAI connection error: {exc.reason}") from exc

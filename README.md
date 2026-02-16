@@ -47,6 +47,7 @@ grpx threat-intel setup --virustotal-key VT_KEY --abuseipdb-key ABUSE_KEY --ipin
 ### 5) Lookup IP intelligence
 ```bash
 grpx threat-intel lookup --ip 8.8.8.8
+grpx threat-intel --lookup 8.8.8.8 --full
 ```
 
 ## Command Reference
@@ -61,7 +62,8 @@ grpx threat-intel lookup --ip 8.8.8.8
 ### Subcommands
 - `grpx setup`: Configure provider/model/credentials.
 - `grpx threat-intel setup`: Store API keys for VT/AbuseIPDB/IPinfo.
-- `grpx threat-intel lookup --ip IP`: Query all configured threat-intel sources.
+- `grpx threat-intel lookup --ip IP [--full]`: Query all configured threat-intel sources.
+- `grpx threat-intel --lookup IP [--full]`: Shortcut form for lookup mode.
 
 ## Configuration
 
@@ -104,6 +106,9 @@ source .venv/bin/activate
 pip install -e .[dev]
 pytest
 ```
+
+## Error Handling
+When a model request fails, `grpx` surfaces provider-specific HTTP error details and includes actionable hints for auth/rate-limit/billing issues (for example invalid API key, quota exceeded, insufficient credits, or payment required).
 
 ## Security Model
 By default `grpx` does **not** send raw file content to the LLM; it streams files locally, computes metadata summaries, and sends only summaries unless explicitly enabled.

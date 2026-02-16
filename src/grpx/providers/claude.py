@@ -6,7 +6,7 @@ import json
 import urllib.error
 import urllib.request
 
-from .base import BaseProvider, ProviderError
+from .base import BaseProvider, ProviderError, format_http_error
 
 
 class ClaudeProvider(BaseProvider):
@@ -34,5 +34,6 @@ class ClaudeProvider(BaseProvider):
                 body = json.loads(response.read().decode("utf-8"))
                 return body["content"][0]["text"]
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="ignore")
-            raise ProviderError(f"Claude error {exc.code}: {detail}") from exc
+            raise ProviderError(format_http_error("Claude", exc)) from exc
+        except urllib.error.URLError as exc:
+            raise ProviderError(f"Claude connection error: {exc.reason}") from exc
